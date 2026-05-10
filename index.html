@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>校友会 · 欢迎回家</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: "Microsoft YaHei", sans-serif;
+        background: #f4f6f9;
+    }
+
+    /* ===== 弹幕区 ===== */
+    .danmu-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 42px;
+        background: rgba(0,0,0,0.75);
+        overflow: hidden;
+        z-index: 9999;
+    }
+
+    .danmu {
+        position: absolute;
+        white-space: nowrap;
+        color: #fff;
+        font-size: 20px;
+        line-height: 42px;
+        animation: danmuMove 12s linear forwards;
+    }
+
+    @keyframes danmuMove {
+        from { transform: translateX(100%); }
+        to { transform: translateX(-100%); }
+    }
+
+    /* ===== 头部 ===== */
+    header {
+        background: linear-gradient(135deg,#1e3c72,#2a5298);
+        color: white;
+        text-align: center;
+        padding: 40px 20px;
+        margin-top: 42px;
+    }
+
+    header h1 {
+        font-size: 40px;
+        letter-spacing: 6px;
+    }
+
+    /* ===== 主体 ===== */
+    .main {
+        max-width: 1200px;
+        margin: 40px auto;
+        display: flex;
+        gap: 40px;
+        padding: 0 20px;
+    }
+
+    /* ===== 左侧：校园图 ===== */
+    .gallery {
+        flex: 2;
+        height: 480px;
+        border-radius: 16px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .slide {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transition: opacity 1s;
+    }
+
+    .slide.active {
+        opacity: 1;
+    }
+
+    /* ===== 右侧：表单 + 二维码 ===== */
+    .right-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+        margin-bottom: 20px;
+        color: #1e3c72;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    .form-group textarea {
+        height: 100px;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg,#1e3c72,#2a5298);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    .qr-box {
+        text-align: center;
+    }
+
+    .qr-box img {
+        width: 200px;
+        height: 200px;
+        margin-top: 10px;
+    }
+
+    footer {
+        background: #1e3c72;
+        color: white;
+        text-align: center;
+        padding: 30px;
+        margin-top: 60px;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- 弹幕区 -->
+<div class="danmu-container" id="danmu"></div>
+
+<!-- 头部 -->
+<header>
+    <h1>🎓 校友会 · 欢迎回家</h1>
+    <p>写下你的心愿，让它飞上墙</p>
+</header>
+
+<!-- 主体 -->
+<div class="main">
+
+    <!-- 左侧：校园图 -->
+    <div class="gallery">
+        <div class="slide active" style="background-image:url('https://ts3.tc.mm.bing.net/th/id/OIP-C.hopJhvKqLq7S4mxTOxpx0AHaE-?rs=1&pid=ImgDetMain&o=7&rm=3')"></div>
+        <div class="slide" style="background-image:url('https://file.100chui.com/files/upload/image/202010/67166f3f-4a3e-472a-a415-2d2ccb3fa2f2.jpg')"></div>
+        <div class="slide" style="background-image:url('https://imgsrc.baidu.com/forum/pic/item/6170510fd9f9d72a620cef26dd2a2834349bbb59.jpg')"></div>
+		<div class="slide" style="background-image:url('https://imgsrc.baidu.com/forum/pic/item/422eb31bb051f81939e0ff71d3b44aed2f73e785.jpg')"></div>
+		<div class="slide" style="background-image:url('https://image.ludengkaoyan.com/Uploads/image/schoolsy/sy388.png')"></div>
+    </div>
+
+    <!-- 右侧 -->
+    <div class="right-panel">
+
+        <!-- 愿望表单 -->
+        <div class="card">
+            <h2>💬 我想回学校…</h2>
+            <div class="form-group">
+                <input id="name" placeholder="你的姓名">
+            </div>
+            <div class="form-group">
+                <input id="year" placeholder="毕业年份，如 2018届">
+            </div>
+            <div class="form-group">
+                <textarea id="wish" placeholder="写下你想回学校最想做的事"></textarea>
+            </div>
+            <button onclick="sendWish()">发布愿望</button>
+        </div>
+
+        <!-- 二维码 -->
+        <div class="card qr-box">
+            <h2>📱 微信扫码参与</h2>
+            <img src="erweima.png" alt="二维码">
+            <p style="margin-top:10px;color:#666;">手机扫码同步上墙</p>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    © 2026 校友会 · 归来仍是少年
+</footer>
+
+<script>
+    /* 轮播 */
+    const slides = document.querySelectorAll(".slide");
+    let i = 0;
+    setInterval(() => {
+        slides[i].classList.remove("active");
+        i = (i + 1) % slides.length;
+        slides[i].classList.add("active");
+    }, 4000);
+
+    /* 弹幕 */
+    function sendDanmu(text) {
+        const container = document.getElementById("danmu");
+        const danmu = document.createElement("div");
+        danmu.className = "danmu";
+        danmu.textContent = text;
+        container.appendChild(danmu);
+
+        danmu.addEventListener("animationend", () => danmu.remove());
+    }
+
+    /* 发布愿望 */
+    function sendWish() {
+        const name = document.getElementById("name").value.trim();
+        const year = document.getElementById("year").value.trim();
+        const wish = document.getElementById("wish").value.trim();
+
+        if (!name || !year || !wish) {
+            alert("请填写完整信息");
+            return;
+        }
+
+        const data = { name, year, wish };
+        const list = JSON.parse(localStorage.getItem("alumniWishes") || "[]");
+        list.push(data);
+        localStorage.setItem("alumniWishes", JSON.stringify(list));
+
+        // 弹幕
+        sendDanmu(`${name}：${wish}`);
+
+        // 清空
+        document.getElementById("wish").value = "";
+    }
+
+    /* 跨页面同步弹幕 */
+    window.addEventListener("storage", e => {
+        if (e.key === "alumniWishes") {
+            const list = JSON.parse(e.newValue || "[]");
+            const last = list[list.length - 1];
+            if (last) sendDanmu(`${last.name}：${last.wish}`);
+        }
+    });
+</script>
+
+</body>
+</html>
