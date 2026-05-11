@@ -14,32 +14,35 @@
     body {
         font-family: "Microsoft YaHei", sans-serif;
         background: #f4f6f9;
+        min-height: 100vh;
     }
 
-    /* ===== 弹幕区 ===== */
+    /* ===== 弹幕区（无背景） ===== */
     .danmu-container {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        height: 42px;
-        background: rgba(0,0,0,0.75);
+        height: 200px;
+        background: transparent;
         overflow: hidden;
         z-index: 9999;
+        pointer-events: none;
     }
 
-    .danmu {
+    .danmu-item {
         position: absolute;
         white-space: nowrap;
-        color: #fff;
         font-size: 20px;
-        line-height: 42px;
-        animation: danmuMove 12s linear forwards;
-    }
-
-    @keyframes danmuMove {
-        from { transform: translateX(100%); }
-        to { transform: translateX(-100%); }
+        font-weight: bold;
+        color: #ffffff;
+        text-shadow:
+            -1px -1px 0 #000,
+             1px -1px 0 #000,
+            -1px  1px 0 #000,
+             1px  1px 0 #000;
+        padding: 4px 12px;
+        border-radius: 20px;
     }
 
     /* ===== 头部 ===== */
@@ -48,7 +51,7 @@
         color: white;
         text-align: center;
         padding: 40px 20px;
-        margin-top: 42px;
+        margin-top: 200px;
     }
 
     header h1 {
@@ -154,6 +157,15 @@
         padding: 30px;
         margin-top: 60px;
     }
+
+    @media (max-width: 900px) {
+        .main {
+            flex-direction: column;
+        }
+        header {
+            margin-top: 220px;
+        }
+    }
 </style>
 </head>
 
@@ -176,8 +188,8 @@
         <div class="slide active" style="background-image:url('https://ts3.tc.mm.bing.net/th/id/OIP-C.hopJhvKqLq7S4mxTOxpx0AHaE-?rs=1&pid=ImgDetMain&o=7&rm=3')"></div>
         <div class="slide" style="background-image:url('https://file.100chui.com/files/upload/image/202010/67166f3f-4a3e-472a-a415-2d2ccb3fa2f2.jpg')"></div>
         <div class="slide" style="background-image:url('https://imgsrc.baidu.com/forum/pic/item/6170510fd9f9d72a620cef26dd2a2834349bbb59.jpg')"></div>
-		<div class="slide" style="background-image:url('https://imgsrc.baidu.com/forum/pic/item/422eb31bb051f81939e0ff71d3b44aed2f73e785.jpg')"></div>
-		<div class="slide" style="background-image:url('https://image.ludengkaoyan.com/Uploads/image/schoolsy/sy388.png')"></div>
+        <div class="slide" style="background-image:url('https://imgsrc.baidu.com/forum/pic/item/422eb31bb051f81939e0ff71d3b44aed2f73e785.jpg')"></div>
+        <div class="slide" style="background-image:url('https://image.ludengkaoyan.com/Uploads/image/schoolsy/sy388.png')"></div>
     </div>
 
     <!-- 右侧 -->
@@ -213,57 +225,76 @@
 </footer>
 
 <script>
-    /* 轮播 */
-    const slides = document.querySelectorAll(".slide");
-    let i = 0;
-    setInterval(() => {
-        slides[i].classList.remove("active");
-        i = (i + 1) % slides.length;
-        slides[i].classList.add("active");
-    }, 4000);
+/* 轮播 */
+const slides = document.querySelectorAll(".slide");
+let i = 0;
+setInterval(() => {
+    slides[i].classList.remove("active");
+    i = (i + 1) % slides.length;
+    slides[i].classList.add("active");
+}, 4000);
 
-    /* 弹幕 */
-    function sendDanmu(text) {
-        const container = document.getElementById("danmu");
-        const danmu = document.createElement("div");
-        danmu.className = "danmu";
-        danmu.textContent = text;
-        container.appendChild(danmu);
+const danmu = document.getElementById("danmu");
 
-        danmu.addEventListener("animationend", () => danmu.remove());
-    }
+/* 随机工具 */
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
 
-    /* 发布愿望 */
-    function sendWish() {
-        const name = document.getElementById("name").value.trim();
-        const year = document.getElementById("year").value.trim();
-        const wish = document.getElementById("wish").value.trim();
+/* 创建弹幕 */
+function addDanmu(text) {
+    const d = document.createElement("div");
+    d.className = "danmu-item";
+    d.textContent = text;
 
-        if (!name || !year || !wish) {
-            alert("请填写完整信息");
-            return;
-        }
+    d.style.top = random(10, 160) + "px";
+    const duration = random(10, 25);
+    d.style.animation = `danmuMove ${duration}s linear forwards`;
 
-        const data = { name, year, wish };
-        const list = JSON.parse(localStorage.getItem("alumniWishes") || "[]");
-        list.push(data);
-        localStorage.setItem("alumniWishes", JSON.stringify(list));
+    danmu.appendChild(d);
 
-        // 弹幕
-        sendDanmu(`${name}：${wish}`);
-
-        // 清空
-        document.getElementById("wish").value = "";
-    }
-
-    /* 跨页面同步弹幕 */
-    window.addEventListener("storage", e => {
-        if (e.key === "alumniWishes") {
-            const list = JSON.parse(e.newValue || "[]");
-            const last = list[list.length - 1];
-            if (last) sendDanmu(`${last.name}：${last.wish}`);
-        }
+    d.addEventListener("animationend", () => {
+        d.remove();
     });
+}
+
+/* 弹幕动画 */
+const style = document.createElement("style");
+style.textContent = `
+@keyframes danmuMove {
+    from { transform: translateX(100vw); }
+    to { transform: translateX(-100%); }
+}`;
+document.head.appendChild(style);
+
+/* 发布愿望 */
+function sendWish() {
+    const name = document.getElementById("name").value.trim();
+    const year = document.getElementById("year").value.trim();
+    const wish = document.getElementById("wish").value.trim();
+
+    if (!name || !year || !wish) {
+        alert("请填写完整信息");
+        return;
+    }
+
+    // 保存到 localStorage
+    const list = JSON.parse(localStorage.getItem("alumniWishes") || "[]");
+    list.push({ name, year, wish });
+    localStorage.setItem("alumniWishes", JSON.stringify(list));
+
+    addDanmu(`${name}：${wish}`);
+
+    document.getElementById("name").value = "";
+    document.getElementById("year").value = "";
+    document.getElementById("wish").value = "";
+}
+
+/* ✅ 页面加载时自动清空历史弹幕 */
+window.onload = function () {
+    localStorage.removeItem("alumniWishes"); // 清空数据
+    danmu.innerHTML = ""; // 清空画面
+};
 </script>
 
 </body>
